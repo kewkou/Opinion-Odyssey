@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Opinion Odyssey</title>
+    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='50' text-anchor='middle' dy='.35em' fill='%236c5ce7'%3E🎭%3C/text%3E%3C/svg%3E">
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --text: #f0f0f0;
+            --primary: #6c5ce7;
+            --secondary: #2d3436;
+            --accent: #00b894;
+            --for-color: #00b894;
+            --against-color: #ff7675;
+            --tie-color: #fdcb6e;
+            --golden: #FFD700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "EmojiOne Color", "Twemoji Mozilla", sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .shop-scroll-container {
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin: 0 -1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--secondary);
+        }
+
+        .shop-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .shop-scroll-container::-webkit-scrollbar-track {
+            background: var(--secondary);
+            border-radius: 3px;
+        }
+
+        .shop-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .shop-items-wrapper {
+            display: inline-flex;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        .shop-item-card {
+            display: inline-block;
+            min-width: 180px;
+            background: #3d3d3d;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            white-space: normal;
+        }
+
+        .shop-item-card.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .shop-item-card button {
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .active {
+            display: flex;
+        }
+
+        .card {
+            background: var(--secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .flex {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #444;
+        }
+
+        button.accent {
+            background: var(--accent);
+        }
+
+        input, textarea {
+            background: #333;
+            border: 1px solid #444;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .timer {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .leaderboard {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .player-card {
+            background: #2d2d2d;
+            padding: 1rem;
+            border-radius: 8px;
+            min-width: 150px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .coin-edit {
+            background: #333;
+            border: 1px solid #444;
+            color: white;
+            width: 60px;
+            padding: 0.3rem;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .debate-ui {
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .debater-card {
+            flex: 1;
+            min-width: 250px;
+            border-top: 4px solid;
+            position: relative;
+        }
+
+        .debater-card.for {
+            border-color: var(--for-color);
+        }
+
+        .debater-card.against {
+            border-color: var(--against-color);
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .timer-btn {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+        }
+
+        .timer-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .vote-btn {
+            flex: 1;
+            min-width: 200px;
+            font-size: 1.2rem;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .vote-btn.for {
+            background: var(--for-color);
+        }
+
+        .vote-btn.against {
+            background: var(--against-color);
+        }
+
+        .setup-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .vote-count {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .result-banner {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .win-banner {
+            background: var(--for-color);
+        }
+
+        .lose-banner {
+            background: var(--against-color);
+        }
+
+        .tie-banner {
+            background: var(--tie-color);
+            color: #333;
+        }
+
+        .perfect-banner {
+            background: linear-gradient(90deg, #fdcb6e, #00b894);
+            animation: rainbow 2s linear infinite;
+            background-size: 200% 200%;
+        }
+
+        .topic-display {
+            font-size: 1.3rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .emoji {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .player-input {
+            margin-bottom: 0.5rem;
+        }
+
+        .player-input input {
+            background: #333;
+            border: 1px solid #444;
+            color: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .vote-count-small {
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            font-weight: bold;
+        }
+
+        .shop-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .shop, .inventory {
+            flex: 1;
+            min-width: 300px;
+            background: #2d2d2d;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .shop-item, .inventory-item {
+            background: #3d3d3d;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shop-item button, .inventory-item button {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .shop-item.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .shop-header, .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .shop-title, .inventory-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .player-coins {
+            background: var(--golden);
+            color: #333;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .item-stock {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-left: 0.5rem;
+        }
+
+        .item-description {
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            color: #ccc;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .inventory-item-card {
+            background: #3d3d3d;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .inventory-item-card:hover {
+            background: #4d4d4d;
+        }
+
+        .inventory-item-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .inventory-item-count {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .shop-items-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .shop-item-card {
+            background: #3d3d3d;
+            padding: 1rem;
+            border-radius: 8px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .shop-item-card.disabled {
+            opacity: 0.6;
+        }
+
+        .shop-item-price {
+            background: var(--golden);
+            color: #333;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            display: inline-block;
+        }
+
+        .shop-item-stock {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 0.3rem;
+        }
+
+        .debater-highlight.for {
+            color: var(--for-color);
+            font-weight: bold;
+        }
+
+        .debater-highlight.against {
+            color: var(--against-color);
+            font-weight: bold;
+        }
+
+        .players-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .target-selector {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #3d3d3d;
+            border-radius: 8px;
+        }
+
+        .target-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .target-button {
+            padding: 0.5rem;
+            background: #444;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .target-button:hover {
+            background: #555;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @media (max-width: 600px) {
+            .setup-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .debate-ui {
+                flex-direction: column;
+            }
+
+            .shop-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Screen -->
+        <div class="screen active" id="setupScreen">
+            <div class="card">
+                <h1>🎭 Opinion Odyssey 🎭</h1>
+                <div class="setup-options">
+                    <div>
+                        <label for="numPlayers">👥 Number of Players:</label>
+                        <input type="number" id="numPlayers" min="5" max="20" value="5" onchange="updatePlayerInputs()">
+                    </div>
+                    <div>
+                        <label for="numRounds">🔄 Number of Rounds:</label>
+                        <input type="number" id="numRounds" min="1" max="10" value="3">
+                    </div>
+                </div>
+                <div id="playerNamesContainer"></div>
+                <label for="customTopics">💬 Custom Topics (comma separated):</label>
+                <textarea id="customTopics" rows="4" placeholder="Enter custom topics or use our defaults"></textarea>
+                <button class="accent" onclick="startGame()">🚀 Start Debate</button>
+            </div>
+        </div>
+
+        <!-- Intermission Screen -->
+        <div class="screen" id="intermissionScreen">
+            <div class="card">
+                <h2>📢 Round <span id="roundNumber">1</span>/<span id="totalRounds"></span></h2>
+                <div class="topic-display">
+                    <span class="emoji">💡</span>
+                    <span id="previewTopic"></span>
+                </div>
+                <div class="players-list">
+                    <span class="emoji">👥</span>
+                    <span id="previewDebaters"></span>
+                </div>
+                <div class="flex">
+                    <button class="secondary" onclick="reshuffleTopic()">🔀 Reshuffle Topic</button>
+                    <button class="accent" onclick="startDebate()">🎬 Begin Debate</button>
+                </div>
+            </div>
+            <div class="players-list" id="intermissionPlayersList"></div>
+        </div>
+
+        <!-- Debate Screen -->
+        <div class="screen" id="debateScreen">
+            <div class="card">
+                <h2><span class="emoji">🎤</span> Debate Time!</h2>
+                <div class="topic-display">
+                    <span class="emoji">💬</span>
+                    <span id="debateTopic"></span>
+                </div>
+                <div class="flex debate-ui">
+                    <div class="card debater-card for">
+                        <div class="vote-count" id="forVotes">0</div>
+                        <h3>✅ Team For</h3>
+                        <p id="currentFor"></p>
+                        <div class="timer" id="forTimer">60</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="adjustTime('for', 5)">+5s</button>
+                            <button class="timer-btn" onclick="adjustTime('for', -5)">-5s</button>
+                            <button class="timer-btn accent" onclick="startDebaterTimer('for')" id="forTimerBtn">▶️ Start</button>
+                        </div>
+                    </div>
+                    <div class="card debater-card against">
+                        <div class="vote-count" id="againstVotes">0</div>
+                        <h3>❌ Team Against</h3>
+                        <p id="currentAgainst"></p>
+                        <div class="timer" id="againstTimer">60</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="adjustTime('against', 5)">+5s</button>
+                            <button class="timer-btn" onclick="adjustTime('against', -5)">-5s</button>
+                            <button class="timer-btn accent" onclick="startDebaterTimer('against')" id="againstTimerBtn">▶️ Start</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex" style="justify-content: center; margin-top: 1rem;">
+                    <button class="accent" onclick="proceedToVoting()">🗳️ Proceed to Voting</button>
+                </div>
+            </div>
+            <div class="players-list" id="debatePlayersList"></div>
+        </div>
+
+        <!-- Voting Screen -->
+        <div class="screen" id="votingScreen">
+            <div class="card">
+                <h2><span class="emoji">🗳️</span> Voting Time!</h2>
+                <div class="flex">
+                    <button class="vote-btn for" onclick="castVote('for')">
+                        <span class="emoji">✅</span> 
+                        <span id="forVoterLabel"></span>
+                        <div class="vote-count-small">(<span id="forVotesSmall">0</span>)</div>
+                    </button>
+                    <button class="vote-btn against" onclick="castVote('against')">
+                        <span class="emoji">❌</span> 
+                        <span id="againstVoterLabel"></span>
+                        <div class="vote-count-small">(<span id="againstVotesSmall">0</span>)</div>
+                    </button>
+                </div>
+                <div class="flex" style="justify-content: center; margin-top: 1rem;">
+                    <button class="accent" onclick="resolveVote()">🏁 Finish Voting</button>
+                </div>
+            </div>
+            <div class="players-list" id="votingPlayersList"></div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="screen" id="resultsScreen">
+            <div class="card">
+                <h2><span class="emoji">🏆</span> Round Results</h2>
+                <div id="roundResultBanner" class="result-banner"></div>
+                <h3><span class="emoji">📊</span> Leaderboard</h3>
+                <div class="leaderboard" id="leaderboard"></div>
+                <div class="flex" style="justify-content: center; margin-top: 2rem;">
+                    <button class="accent" id="continueButton">➡️ Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tie Breaker Screen -->
+        <div class="screen" id="tieBreakerScreen">
+            <div class="card">
+                <h2><span class="emoji">⚔️</span> Tie Breaker!</h2>
+                <div class="topic-display">
+                    <span class="emoji">💡</span>
+                    <span id="tieTopic"></span>
+                </div>
+                <div class="flex debate-ui">
+                    <div class="card debater-card for">
+                        <div class="vote-count" id="tieForVotes">0</div>
+                        <h3>✅ Team For</h3>
+                        <p id="tieCurrentFor"></p>
+                        <div class="timer" id="tieForTimer">30</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="adjustTieTime('for', 5)">+5s</button>
+                            <button class="timer-btn" onclick="adjustTieTime('for', -5)">-5s</button>
+                            <button class="timer-btn accent" onclick="startTieDebaterTimer('for')" id="tieForTimerBtn">▶️ Start</button>
+                        </div>
+                    </div>
+                    <div class="card debater-card against">
+                        <div class="vote-count" id="tieAgainstVotes">0</div>
+                        <h3>❌ Team Against</h3>
+                        <p id="tieCurrentAgainst"></p>
+                        <div class="timer" id="tieAgainstTimer">30</div>
+                        <div class="timer-controls">
+                            <button class="timer-btn" onclick="adjustTieTime('against', 5)">+5s</button>
+                            <button class="timer-btn" onclick="adjustTieTime('against', -5)">-5s</button>
+                            <button class="timer-btn accent" onclick="startTieDebaterTimer('against')" id="tieAgainstTimerBtn">▶️ Start</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex" style="justify-content: center; margin-top: 1rem;">
+                    <button class="accent" onclick="proceedToTieVoting()">🗳️ Proceed to Voting</button>
+                </div>
+            </div>
+            <div class="players-list" id="tieBreakerPlayersList"></div>
+        </div>
+
+        <!-- Tie Voting Screen -->
+        <div class="screen" id="tieVotingScreen">
+            <div class="card">
+                <h2><span class="emoji">⚖️</span> Tie Breaker Vote!</h2>
+                <div class="flex">
+                    <button class="vote-btn for" onclick="castTieVote('for')">
+                        <span class="emoji">✅</span> 
+                        <span id="tieForVoterLabel"></span>
+                        <div class="vote-count-small">(<span id="tieForVotesSmall">0</span>)</div>
+                    </button>
+                    <button class="vote-btn against" onclick="castTieVote('against')">
+                        <span class="emoji">❌</span> 
+                        <span id="tieAgainstVoterLabel"></span>
+                        <div class="vote-count-small">(<span id="tieAgainstVotesSmall">0</span>)</div>
+                    </button>
+                </div>
+                <div class="flex" style="justify-content: center; margin-top: 1rem;">
+                    <button class="accent" onclick="resolveTieVote()">🏁 Finish Voting</button>
+                </div>
+            </div>
+            <div class="players-list" id="tieVotingPlayersList"></div>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div class="modal" id="inventoryModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeInventoryModal()">×</button>
+            <h2><span class="emoji">🎒</span> <span id="inventoryPlayerName">Player</span>'s Inventory</h2>
+            <div class="player-coins" style="margin-bottom: 1rem;">💰 <span id="modalPlayerCoins">0</span> coins</div>
+            <h3 style="margin-top: 1.5rem;">🎒 Inventory</h3>
+            <div class="inventory-grid" id="inventoryGrid"></div>
+            <div class="shop-container">
+                <div class="card">
+                    <div class="shop-header">
+                        <h3><span class="emoji">🛒</span> Shop</h3>
+                        <div class="player-coins">💰 <span id="modalPlayerCoinsShop">0</span> coins</div>
+                    </div>
+                    <div class="shop-scroll-container">
+                        <div class="shop-items-wrapper" id="shopItemsGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Speaker Selection Modal -->
+    <div class="modal" id="speakerModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeSpeakerModal()">×</button>
+            <h2>🎤 Select Current Speaker</h2>
+            <div class="target-buttons" style="margin-top: 1rem;">
+                <button class="vote-btn for" onclick="setCurrentSpeaker('for')">✅ Team For</button>
+                <button class="vote-btn against" onclick="setCurrentSpeaker('against')">❌ Team Against</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Game state (identical to original, only fixed meta charset)
+        const gameState = {
+            players: [],
+            topics: [],
+            currentRound: 0,
+            totalRounds: 0,
+            coins: {},
+            wins: {},
+            losses: {},
+            currentDebaters: {},
+            activeTimer: null,
+            timerRunning: false,
+            currentDebaterSpeaking: null,
+            forTime: 60,
+            againstTime: 60,
+            votes: { for: 0, against: 0 },
+            tieVotes: { for: 0, against: 0 },
+            usedTopics: [],
+            isTieBreaker: false,
+            notifications: [],
+            shopItems: {
+                clock: { name: "⏱️ Clock", price: 20, stock: 7, description: "+30s (use before starting round)" },
+                reshuffle: { name: "🔀 Reshuffle", price: 15, stock: 5, description: "Change topic" },
+                redFlag: { name: "🚩 Red Flag", price: 30, stock: 5, description: "Gives 1 additional vote" },
+                microphone: { name: "🎤 Microphone", price: 10, stock: 5, description: "Ask for someone's help (15s)" },
+                doubleDown: { name: "💰 Double Down", price: 15, stock: 7, description: "Doubles coins if you win" },
+                dagger: { name: "🗡️ Dagger", price: 5, stock: 15, description: "50% chance to steal 15 coins or give 10 coins" },
+                nuhUh: { name: "🙅 NUH UH", price: 100, stock: 3, description: "Win the debate" }
+            },
+            playerInventories: {},
+            currentPlayerIndex: 0,
+            doubleDownPlayers: [],
+            viewingPlayerInventory: null,
+            redFlagUsed: false,
+            microphoneUsed: false,
+            microphoneHelper: null,
+            originalTime: 60,
+            originalTeam: null
+        };
+
+        const debateTopics = {
+            technology: {
+                subjects: ["AI", "social media", "internet", "self-driving cars", "facial recognition", "smartphones", "data collection", "video games", "cryptocurrency"],
+                perspectives: [
+                    { text: "is/are doing more harm than good", formats: ["Debate: {subject} {perspective}", "{subject} is/are a danger to humanity", "Let's discuss: {subject} {perspective}", "The truth about {subject}: it/they {perspective}"] },
+                    { text: "need(s) stricter regulations", formats: ["Should {subject} {perspective}?", "We need to talk about how {subject} {perspective}", "Hot take: {subject} {perspective}", "Why {subject} {perspective}"] },
+                    { text: "is/are changing society too quickly", formats: ["{subject} {perspective} - agree or disagree?", "Discussion: {subject} {perspective}", "How {subject} {perspective}", "The impact of {subject} {perspective}"] }
+                ]
+            },
+            education: {
+                subjects: ["homework", "school uniforms", "surprise tests", "college admissions", "online classes", "summer school", "cursive writing", "calculators in class"],
+                perspectives: [
+                    { text: "hurt(s) students more than it/they help(s)", formats: ["The case against {subject}: it/they {perspective}", "Why {subject} {perspective}", "Fact: {subject} {perspective}", "{subject} {perspective} - discuss"] },
+                    { text: "should be mandatory", formats: ["My argument: {subject} {perspective}", "{subject} should be banned", "Education debate: {subject} {perspective}"] }
+                ]
+            },
+            society: {
+                subjects: ["taxes", "universal healthcare", "minimum wage", "voting laws", "public transportation", "social security", "property laws"],
+                perspectives: [
+                    { text: "is/are unfair", formats: ["How {subject} {perspective}", "{subject} is/are a danger to humanity", "The problem with {subject}: it/they {perspective}", "Why {subject} need(s) improvements - it/they {perspective}", "Debate this: {subject} {perspective}"] },
+                    { text: "make(s) society more equal", formats: ["Would {subject} {perspective}?", "The benefits of {subject}: it/they {perspective}", "Policy discussion: {subject} {perspective}"] }
+                ]
+            },
+            lifestyle: {
+                subjects: ["vegetarianism", "minimalism", "influencer culture", "fast fashion", "DIY trends", "subscription services", "distant working", "extravagance"],
+                perspectives: [
+                    { text: "is/are a shame", formats: ["Hot take: {subject} {perspective}", "Why I think {subject} {perspective}", "The truth about {subject}: it/they {perspective}"] },
+                    { text: "improve(s) quality of life", formats: ["How {subject} {perspective}", "The benefits of {subject}: it/they {perspective}", "{subject} is/are a danger to humanity", "Why you should try {subject} - it/they {perspective}", "Lifestyle debate: {subject} {perspective}"] }
+                ]
+            },
+            future: {
+                subjects: ["space tourism", "lab-grown meat", "flying cars", "robot workers", "virtual reality", "brain implants", "genetic engineering", "immortality tech"],
+                perspectives: [
+                    { text: "is/are science fiction, not reality", formats: ["What if {subject} {perspective}?", "Why {subject} {perspective}", "The truth about {subject}: it/they {perspective}", "Debunking {subject} - it/they {perspective}"] },
+                    { text: "will revolutionize our world", formats: ["How {subject} {perspective}", "The future is coming: {subject} {perspective}", "Why {subject} {perspective}", "Tech debate: {subject} {perspective}"] }
+                ]
+            }
+        };
+
+        function generateRandomTopics(count = 20) {
+            const topics = [];
+            const categories = Object.keys(debateTopics);
+            while (topics.length < count) {
+                const category = categories[Math.floor(Math.random() * categories.length)];
+                const subject = debateTopics[category].subjects[Math.floor(Math.random() * debateTopics[category].subjects.length)];
+                const perspective = debateTopics[category].perspectives[Math.floor(Math.random() * debateTopics[category].perspectives.length)];
+                const format = perspective.formats[Math.floor(Math.random() * perspective.formats.length)];
+                const topic = format.replace("{subject}", subject).replace("{perspective}", perspective.text).replace(/\.$/, '');
+                if (topic.length <= 140 && !topics.includes(topic)) topics.push(topic);
+            }
+            return topics;
+        }
+
+        function updatePlayerInputs() {
+            const numPlayers = parseInt(document.getElementById('numPlayers').value);
+            const container = document.getElementById('playerNamesContainer');
+            container.innerHTML = '<label>✏️ Player Names:</label>';
+            for (let i = 1; i <= numPlayers; i++) {
+                const div = document.createElement('div');
+                div.className = 'player-input';
+                div.innerHTML = `<input type="text" id="playerName${i}" placeholder="Player ${i} Name" value="Player ${i}">`;
+                container.appendChild(div);
+            }
+        }
+
+        window.onload = function() { updatePlayerInputs(); };
+
+        function startGame() {
+            const numPlayers = parseInt(document.getElementById('numPlayers').value);
+            const numRounds = parseInt(document.getElementById('numRounds').value);
+            const customTopics = document.getElementById('customTopics').value.split(',').map(t => t.trim()).filter(t => t.length > 0);
+            if (numPlayers < 5) { showNotification("You need at least 5 players to start the game!", 5000); return; }
+            gameState.notifications = [];
+            document.getElementById('notification').classList.remove('show');
+            gameState.players = [];
+            for (let i = 1; i <= numPlayers; i++) {
+                const name = document.getElementById(`playerName${i}`).value.trim() || `Player ${i}`;
+                gameState.players.push(name);
+            }
+            gameState.topics = customTopics.length > 0 ? customTopics : generateRandomTopics(60);
+            gameState.totalRounds = numRounds;
+            gameState.currentRound = 0;
+            gameState.usedTopics = [];
+            gameState.isTieBreaker = false;
+            gameState.currentPlayerIndex = 0;
+            gameState.doubleDownPlayers = [];
+            gameState.redFlagUsed = false;
+            gameState.microphoneUsed = false;
+            gameState.microphoneHelper = null;
+            gameState.originalTime = 0;
+            gameState.originalTeam = null;
+            gameState.players.forEach(player => {
+                gameState.coins[player] = 0;
+                gameState.wins[player] = 0;
+                gameState.losses[player] = 0;
+                gameState.playerInventories[player] = {};
+            });
+            gameState.shopItems = {
+                clock: { name: "⏱️ Clock", price: 20, stock: 7, description: "+30s (use before starting round)" },
+                reshuffle: { name: "🔀 Reshuffle", price: 15, stock: 5, description: "Change topic" },
+                redFlag: { name: "🚩 Red Flag", price: 30, stock: 5, description: "Gives 1 additional vote" },
+                microphone: { name: "🎤 Microphone", price: 10, stock: 5, description: "Ask for someone's help (15s)" },
+                doubleDown: { name: "💰 Double Down", price: 15, stock: 7, description: "Doubles coins if you win" },
+                dagger: { name: "🗡️ Dagger", price: 5, stock: 15, description: "50% chance to steal 15 coins or give 10 coins" },
+                nuhUh: { name: "🙅 NUH UH", price: 100, stock: 3, description: "Win the debate" }
+            };
+            document.getElementById('totalRounds').textContent = gameState.totalRounds;
+            nextRound();
+        }
+
+        function nextRound() {
+            if (gameState.currentRound >= gameState.totalRounds) { showGameOver(); return; }
+            gameState.currentRound++;
+            gameState.redFlagUsed = false;
+            gameState.microphoneUsed = false;
+            gameState.microphoneHelper = null;
+            gameState.originalTime = 0;
+            gameState.originalTeam = null;
+            const availablePlayers = [...gameState.players];
+            const forIndex = Math.floor(Math.random() * availablePlayers.length);
+            const forPlayer = availablePlayers.splice(forIndex, 1)[0];
+            const againstPlayer = availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
+            gameState.currentDebaters = { for: forPlayer, against: againstPlayer, topic: getRandomTopic() };
+            gameState.forTime = 60;
+            gameState.againstTime = 60;
+            gameState.votes = { for: 0, against: 0 };
+            gameState.currentDebaterSpeaking = null;
+            document.getElementById('roundNumber').textContent = gameState.currentRound;
+            document.getElementById('previewTopic').textContent = gameState.currentDebaters.topic;
+            const debatersDisplay = document.getElementById('previewDebaters');
+            debatersDisplay.innerHTML = `<span class="debater-highlight for">${forPlayer}</span> (For) vs <span class="debater-highlight against">${againstPlayer}</span> (Against)`;
+            document.getElementById('forTimer').textContent = gameState.forTime;
+            document.getElementById('againstTimer').textContent = gameState.againstTime;
+            document.getElementById('forVotes').textContent = '0';
+            document.getElementById('againstVotes').textContent = '0';
+            document.getElementById('forVotesSmall').textContent = '0';
+            document.getElementById('againstVotesSmall').textContent = '0';
+            document.getElementById('forVoterLabel').textContent = forPlayer;
+            document.getElementById('againstVoterLabel').textContent = againstPlayer;
+            updatePlayerLists();
+            showScreen('intermissionScreen');
+        }
+
+        function updatePlayerLists() {
+            const screens = ['intermissionPlayersList', 'debatePlayersList', 'votingPlayersList', 'resultsPlayersList', 'tieBreakerPlayersList', 'tieVotingPlayersList'];
+            screens.forEach(screenId => {
+                const container = document.getElementById(screenId);
+                if (container) {
+                    container.innerHTML = gameState.players.map(player => `
+                        <div class="player-card" onclick="showPlayerInventory('${player}')">
+                            <h3>${player}</h3>
+                            <p>🏅 ${gameState.wins[player]} wins</p>
+                            <p>💔 ${gameState.losses[player]} losses</p>
+                            <p>💰 ${gameState.coins[player]} coins</p>
+                        </div>
+                    `).join('');
+                }
+            });
+        }
+
+        function showPlayerInventory(player) {
+            gameState.viewingPlayerInventory = player;
+            const modal = document.getElementById('inventoryModal');
+            const inventoryGrid = document.getElementById('inventoryGrid');
+            const shopGrid = document.getElementById('shopItemsGrid');
+            const playerNameElement = document.getElementById('inventoryPlayerName');
+            const playerCoinsElement = document.getElementById('modalPlayerCoins');
+            const playerCoinsShop = document.getElementById('modalPlayerCoinsShop');
+            playerNameElement.textContent = player;
+            playerCoinsElement.textContent = gameState.coins[player];
+            if(playerCoinsShop) playerCoinsShop.textContent = gameState.coins[player];
+            inventoryGrid.innerHTML = '';
+            shopGrid.innerHTML = '';
+            const inventory = gameState.playerInventories[player];
+            let hasItems = false;
+            for (const [itemKey, count] of Object.entries(inventory)) {
+                if (count > 0) {
+                    hasItems = true;
+                    const item = gameState.shopItems[itemKey];
+                    const itemCard = document.createElement('div');
+                    itemCard.className = 'inventory-item-card';
+                    itemCard.innerHTML = `<div class="inventory-item-name">${item.name}</div><div class="inventory-item-count">${count}</div><div class="item-description" style="margin-top: 0.5rem; font-size: 0.8rem;">${item.description}</div>`;
+                    itemCard.onclick = () => useItem(itemKey, player);
+                    inventoryGrid.appendChild(itemCard);
+                }
+            }
+            if (!hasItems) inventoryGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 1rem; color: #aaa;">No items yet</div>';
+            const currentScreen = document.querySelector('.screen.active').id;
+            if (currentScreen === 'resultsScreen') {
+                for (const [key, item] of Object.entries(gameState.shopItems)) {
+                    if (item.stock <= 0) continue;
+                    let discount = 0;
+                    if (key === 'nuhUh') {
+                        if (gameState.totalRounds <= 12) discount = 50;
+                        else if (gameState.totalRounds <= 20) discount = 25;
+                        else if (gameState.totalRounds <= 30) discount = 10;
+                        else if (gameState.totalRounds <= 40) discount = 5;
+                    }
+                    const discountedPrice = Math.floor(item.price * (1 - discount / 100));
+                    const canAfford = gameState.coins[player] >= discountedPrice;
+                    const shopItem = document.createElement('div');
+                    shopItem.className = `shop-item-card ${canAfford ? '' : 'disabled'}`;
+                    shopItem.innerHTML = `<div class="inventory-item-name">${item.name}</div><div class="shop-item-price">${discountedPrice} coins${discount > 0 ? ` (${discount}% off!)` : ''}</div><div class="shop-item-stock">Stock: ${item.stock}</div><div class="item-description">${item.description}</div><button onclick="buyItem('${key}', ${discountedPrice}, '${player}')" ${canAfford ? '' : 'disabled'}>Buy</button>`;
+                    shopGrid.appendChild(shopItem);
+                }
+            } else {
+                shopGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 1rem; color: #aaa;">Shop only available in results screen</div>';
+            }
+            modal.classList.add('active');
+        }
+
+        function closeInventoryModal() { document.getElementById('inventoryModal').classList.remove('active'); gameState.viewingPlayerInventory = null; }
+        function buyItem(itemKey, price, player) {
+            if (gameState.coins[player] >= price && gameState.shopItems[itemKey].stock > 0) {
+                gameState.coins[player] -= price;
+                gameState.shopItems[itemKey].stock--;
+                if (!gameState.playerInventories[player][itemKey]) gameState.playerInventories[player][itemKey] = 0;
+                gameState.playerInventories[player][itemKey]++;
+                showNotification(`${player} purchased ${gameState.shopItems[itemKey].name} for ${price} coins!`);
+                if (gameState.viewingPlayerInventory === player) showPlayerInventory(player);
+                updatePlayerLists();
+                updateLeaderboard();
+            }
+        }
+        function useItem(itemKey, player = null) {
+            const currentPlayer = player || gameState.viewingPlayerInventory;
+            if (!currentPlayer) return;
+            const inventory = gameState.playerInventories[currentPlayer];
+            if (!inventory[itemKey] || inventory[itemKey] <= 0) { showNotification("You don't have this item!"); return; }
+            const currentScreen = document.querySelector('.screen.active').id;
+            switch (itemKey) {
+                case 'clock':
+                    if (currentScreen !== 'intermissionScreen') { showNotification("Clock can only be used in intermission!"); return; }
+                    if (currentPlayer === gameState.currentDebaters.for || currentPlayer === gameState.currentDebaters.against) {
+                        inventory[itemKey]--;
+                        showNotification(`${currentPlayer} will get 90 seconds in their debate time!`);
+                        gameState.playerInventories[currentPlayer].clockUsed = true;
+                        closeInventoryModal();
+                    } else { showNotification("Only the current debaters can use this item!"); }
+                    break;
+                case 'reshuffle':
+                    if (currentScreen !== 'intermissionScreen') { showNotification("Reshuffle can only be used in intermission!"); return; }
+                    inventory[itemKey]--;
+                    reshuffleTopic();
+                    showNotification(`${currentPlayer} reshuffled the topic!`);
+                    closeInventoryModal();
+                    break;
+                case 'redFlag':
+                    if (currentScreen !== 'votingScreen' && currentScreen !== 'tieVotingScreen') { showNotification("Red Flag can only be used during voting!"); return; }
+                    inventory[itemKey]--;
+                    gameState.redFlagUsed = true;
+                    showNotification(`${currentPlayer} used Red Flag! They get an extra vote.`);
+                    closeInventoryModal();
+                    break;
+                case 'microphone':
+                    if (currentScreen !== 'debateScreen' && currentScreen !== 'tieBreakerScreen') { showNotification("Microphone can only be used during debate!"); return; }
+                    if (currentPlayer !== gameState.currentDebaters.for && currentPlayer !== gameState.currentDebaters.against) { showNotification("Only debaters can use the microphone!"); return; }
+                    const isTieBreaker = currentScreen === 'tieBreakerScreen';
+                    const team = currentPlayer === gameState.currentDebaters.for ? 'for' : 'against';
+                    gameState.originalTime = team === 'for' ? (isTieBreaker ? gameState.forTime : gameState.forTime) : (isTieBreaker ? gameState.againstTime : gameState.againstTime);
+                    inventory.microphone--;
+                    gameState.microphoneHelper = currentPlayer;
+                    gameState.helpingTeam = team;
+                    if (team === 'for') gameState.forTime = 15;
+                    else gameState.againstTime = 15;
+                    const timerElement = isTieBreaker ? `tie${team.charAt(0).toUpperCase() + team.slice(1)}Timer` : `${team}Timer`;
+                    document.getElementById(timerElement).textContent = 15;
+                    showNotification(`${currentPlayer} is using the microphone for 15 seconds!`);
+                    closeInventoryModal();
+                    break;
+                case 'doubleDown':
+                    if (currentScreen !== 'intermissionScreen') { showNotification("Double Down can only be used in intermission!"); return; }
+                    if (currentPlayer === gameState.currentDebaters.for || currentPlayer === gameState.currentDebaters.against) {
+                        inventory[itemKey]--;
+                        gameState.doubleDownPlayers.push(currentPlayer);
+                        showNotification(`${currentPlayer} will get double coins if they win this round!`);
+                        closeInventoryModal();
+                    } else { showNotification("Only the current debaters can use this item!"); }
+                    break;
+                case 'dagger':
+                    const modalInv = document.getElementById('inventoryModal');
+                    const invGrid = document.getElementById('inventoryGrid');
+                    invGrid.innerHTML = `<div class="target-selector"><h3>Select a target:</h3><div class="target-buttons">${gameState.players.filter(p => p !== currentPlayer).map(p => `<div class="target-button" onclick="useDaggerOn('${p}', '${currentPlayer}')">${p}</div>`).join('')}</div></div>`;
+                    break;
+                case 'nuhUh':
+                    if (currentScreen !== 'debateScreen' && currentScreen !== 'tieBreakerScreen') { showNotification("NUH UH can only be used during debate!"); return; }
+                    if (currentPlayer === gameState.currentDebaters.for || currentPlayer === gameState.currentDebaters.against) {
+                        inventory[itemKey]--;
+                        const nuhTeam = currentPlayer === gameState.currentDebaters.for ? 'for' : 'against';
+                        if (gameState.isTieBreaker) showResults(nuhTeam);
+                        else { gameState.votes[nuhTeam] = gameState.players.length - 2; showResults(); }
+                        showNotification(`${currentPlayer} used NUH UH and instantly won the debate!`);
+                        closeInventoryModal();
+                    } else { showNotification("Only the current debaters can use this item!"); }
+                    break;
+                default: showNotification("Unknown item!");
+            }
+        }
+        function useDaggerOn(targetPlayer, currentPlayer) {
+            const inventory = gameState.playerInventories[currentPlayer];
+            const stealAmount = 15, giveAmount = 10;
+            if (Math.random() < 0.5) {
+                if (gameState.coins[targetPlayer] < stealAmount) { showNotification(`${targetPlayer} is too poor to steal from! Dagger wasn't used.`); return; }
+                inventory.dagger--;
+                gameState.coins[targetPlayer] -= stealAmount;
+                gameState.coins[currentPlayer] += stealAmount;
+                showNotification(`${currentPlayer} stole ${stealAmount} coins from ${targetPlayer}!`);
+            } else {
+                inventory.dagger--;
+                const coinsToGive = Math.min(giveAmount, gameState.coins[currentPlayer]);
+                gameState.coins[currentPlayer] -= coinsToGive;
+                gameState.coins[targetPlayer] += coinsToGive;
+                showNotification(coinsToGive === 0 ? `${currentPlayer} tried to give coins but had none! Dagger was still used.` : `${currentPlayer} gave ${coinsToGive} coins to ${targetPlayer}!`);
+            }
+            updatePlayerLists();
+            updateLeaderboard();
+            closeInventoryModal();
+        }
+        function showNotification(message, duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            gameState.notifications.push(message);
+            setTimeout(() => notification.classList.remove('show'), duration);
+        }
+        function clearNotifications() { gameState.notifications = []; }
+        function showGameOver() {
+            clearNotifications();
+            let maxWins = Math.max(...gameState.players.map(p => gameState.wins[p]));
+            let winners = gameState.players.filter(p => gameState.wins[p] === maxWins);
+            if (winners.length > 1) {
+                const minLosses = Math.min(...winners.map(p => gameState.losses[p]));
+                winners = winners.filter(p => gameState.losses[p] === minLosses);
+            }
+            let winnerText = winners.length === 1 ? `${winners[0]} wins with ${maxWins} victories!` : `Tie between ${winners.join(', ')} with ${maxWins} victories!`;
+            const resultBanner = document.createElement('div');
+            resultBanner.className = 'result-banner win-banner';
+            resultBanner.innerHTML = `<span class="emoji">🏆</span> Game Over! ${winnerText}`;
+            const leaderboardDiv = document.getElementById('leaderboard');
+            leaderboardDiv.parentNode.insertBefore(resultBanner, leaderboardDiv);
+            updateLeaderboard();
+            showScreen('resultsScreen');
+            const continueBtn = document.getElementById('continueButton');
+            continueBtn.textContent = '🔄 Play Again';
+            continueBtn.onclick = resetGame;
+        }
+        function getRandomTopic() {
+            const availableTopics = gameState.topics.filter(t => !gameState.usedTopics.includes(t));
+            if (availableTopics.length === 0) { gameState.usedTopics = []; return gameState.topics[Math.floor(Math.random() * gameState.topics.length)]; }
+            const topic = availableTopics[Math.floor(Math.random() * availableTopics.length)];
+            gameState.usedTopics.push(topic);
+            return topic;
+        }
+        function reshuffleTopic() { gameState.currentDebaters.topic = getRandomTopic(); document.getElementById('previewTopic').textContent = gameState.currentDebaters.topic; }
+        function startDebate() {
+            showScreen('debateScreen');
+            document.getElementById('debateTopic').textContent = gameState.currentDebaters.topic;
+            document.getElementById('currentFor').textContent = gameState.currentDebaters.for;
+            document.getElementById('currentAgainst').textContent = gameState.currentDebaters.against;
+            const forPlayer = gameState.currentDebaters.for, againstPlayer = gameState.currentDebaters.against;
+            if (gameState.playerInventories[forPlayer]?.clockUsed) { gameState.forTime = 90; delete gameState.playerInventories[forPlayer].clockUsed; }
+            if (gameState.playerInventories[againstPlayer]?.clockUsed) { gameState.againstTime = 90; delete gameState.playerInventories[againstPlayer].clockUsed; }
+            document.getElementById('forTimer').textContent = gameState.forTime;
+            document.getElementById('againstTimer').textContent = gameState.againstTime;
+        }
+        function startDebaterTimer(team) {
+            if (gameState.timerRunning) { clearInterval(gameState.activeTimer); gameState.timerRunning = false; document.getElementById(`${team}TimerBtn`).textContent = '▶️ Start'; return; }
+            gameState.currentDebaterSpeaking = team;
+            gameState.timerRunning = true;
+            document.getElementById(`${team}TimerBtn`).textContent = '⏸️ Pause';
+            const timerElement = document.getElementById(`${team}Timer`);
+            let timeLeft = team === 'for' ? gameState.forTime : gameState.againstTime;
+            gameState.activeTimer = setInterval(() => {
+                timeLeft--;
+                if (team === 'for') gameState.forTime = timeLeft; else gameState.againstTime = timeLeft;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(gameState.activeTimer);
+                    gameState.timerRunning = false;
+                    document.getElementById(`${team}TimerBtn`).textContent = '▶️ Start';
+                    if (gameState.microphoneHelper && team === gameState.helpingTeam) {
+                        if (team === 'for') { gameState.forTime = gameState.originalTime; document.getElementById('forTimer').textContent = gameState.originalTime; }
+                        else { gameState.againstTime = gameState.originalTime; document.getElementById('againstTimer').textContent = gameState.originalTime; }
+                        showNotification("Microphone time finished! Back to regular time.");
+                        gameState.microphoneHelper = null; gameState.helpingTeam = null; gameState.originalTime = 0;
+                    }
+                    gameState.currentDebaterSpeaking = null;
+                }
+            }, 1000);
+        }
+        function adjustTime(team, seconds) { if (team === 'for') { gameState.forTime = Math.max(5, gameState.forTime + seconds); document.getElementById('forTimer').textContent = gameState.forTime; } else { gameState.againstTime = Math.max(5, gameState.againstTime + seconds); document.getElementById('againstTimer').textContent = gameState.againstTime; } }
+        function proceedToVoting() { if (gameState.timerRunning) { clearInterval(gameState.activeTimer); gameState.timerRunning = false; } startVoting(); }
+        function startVoting() { showScreen('votingScreen'); gameState.votes = { for: 0, against: 0 }; updateVoteCounts(); }
+        function castVote(team) { const maxVotes = gameState.players.length - 2; const currentVotes = gameState.votes.for + gameState.votes.against; if (currentVotes >= maxVotes + (gameState.redFlagUsed ? 1 : 0)) { showNotification("All votes have been cast!"); return; } gameState.votes[team]++; updateVoteCounts(); }
+        function updateVoteCounts() { document.getElementById('forVotes').textContent = gameState.votes.for; document.getElementById('againstVotes').textContent = gameState.votes.against; document.getElementById('forVotesSmall').textContent = gameState.votes.for; document.getElementById('againstVotesSmall').textContent = gameState.votes.against; }
+        function resolveVote() { const { for: forVotes, against: againstVotes } = gameState.votes; const voters = gameState.players.length - 2; const maxAllowedVotes = voters + (gameState.redFlagUsed ? 1 : 0); if ((forVotes + againstVotes) > maxAllowedVotes) { showNotification("Too many votes have been cast!"); return; } if (forVotes === againstVotes) { startTieBreaker(); return; } showResults(); }
+        function startTieBreaker() {
+            gameState.isTieBreaker = true;
+            gameState.tieVotes = { for: 0, against: 0 };
+            gameState.redFlagUsed = false;
+            gameState.microphoneUsed = false;
+            gameState.microphoneHelper = null;
+            gameState.forTime = 30;
+            gameState.againstTime = 30;
+            document.getElementById('tieTopic').textContent = gameState.currentDebaters.topic;
+            document.getElementById('tieCurrentFor').textContent = gameState.currentDebaters.for;
+            document.getElementById('tieCurrentAgainst').textContent = gameState.currentDebaters.against;
+            document.getElementById('tieForTimer').textContent = gameState.forTime;
+            document.getElementById('tieAgainstTimer').textContent = gameState.againstTime;
+            document.getElementById('tieForVotes').textContent = '0';
+            document.getElementById('tieAgainstVotes').textContent = '0';
+            document.getElementById('tieForVotesSmall').textContent = '0';
+            document.getElementById('tieAgainstVotesSmall').textContent = '0';
+            document.getElementById('tieForVoterLabel').textContent = gameState.currentDebaters.for;
+            document.getElementById('tieAgainstVoterLabel').textContent = gameState.currentDebaters.against;
+            document.getElementById('tieForTimerBtn').textContent = '▶️ Start';
+            document.getElementById('tieAgainstTimerBtn').textContent = '▶️ Start';
+            showScreen('tieBreakerScreen');
+        }
+        function startTieDebaterTimer(team) {
+            if (gameState.timerRunning) { clearInterval(gameState.activeTimer); gameState.timerRunning = false; document.getElementById(`tie${team.charAt(0).toUpperCase() + team.slice(1)}TimerBtn`).textContent = '▶️ Start'; return; }
+            gameState.currentDebaterSpeaking = team;
+            gameState.timerRunning = true;
+            document.getElementById(`tie${team.charAt(0).toUpperCase() + team.slice(1)}TimerBtn`).textContent = '⏸️ Pause';
+            const timerElement = document.getElementById(`tie${team.charAt(0).toUpperCase() + team.slice(1)}Timer`);
+            let timeLeft = team === 'for' ? gameState.forTime : gameState.againstTime;
+            gameState.activeTimer = setInterval(() => {
+                timeLeft--;
+                if (team === 'for') gameState.forTime = timeLeft; else gameState.againstTime = timeLeft;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(gameState.activeTimer);
+                    gameState.timerRunning = false;
+                    document.getElementById(`tie${team.charAt(0).toUpperCase() + team.slice(1)}TimerBtn`).textContent = '▶️ Start';
+                    if (gameState.microphoneHelper && team === gameState.helpingTeam) {
+                        if (team === 'for') { gameState.forTime = gameState.originalTime; document.getElementById('tieForTimer').textContent = gameState.originalTime; }
+                        else { gameState.againstTime = gameState.originalTime; document.getElementById('tieAgainstTimer').textContent = gameState.originalTime; }
+                        showNotification("Help time finished! Back to regular time.");
+                        gameState.microphoneHelper = null; gameState.helpingTeam = null;
+                    }
+                    gameState.currentDebaterSpeaking = null;
+                }
+            }, 1000);
+        }
+        function adjustTieTime(team, seconds) { if (team === 'for') { gameState.forTime = Math.max(5, gameState.forTime + seconds); document.getElementById('tieForTimer').textContent = gameState.forTime; } else { gameState.againstTime = Math.max(5, gameState.againstTime + seconds); document.getElementById('tieAgainstTimer').textContent = gameState.againstTime; } }
+        function proceedToTieVoting() { if (gameState.timerRunning) { clearInterval(gameState.activeTimer); gameState.timerRunning = false; } document.getElementById('tieForTimerBtn').textContent = '▶️ Start'; document.getElementById('tieAgainstTimerBtn').textContent = '▶️ Start'; showScreen('tieVotingScreen'); }
+        function castTieVote(team) { const maxVotes = gameState.players.length - 2; const currentVotes = gameState.tieVotes.for + gameState.tieVotes.against; const maxAllowedVotes = maxVotes + (gameState.redFlagUsed ? 1 : 0); if (currentVotes >= maxAllowedVotes) { showNotification("All votes have been cast!"); return; } gameState.tieVotes[team]++; updateTieVoteCounts(); }
+        function updateTieVoteCounts() { document.getElementById('tieForVotes').textContent = gameState.tieVotes.for; document.getElementById('tieAgainstVotes').textContent = gameState.tieVotes.against; document.getElementById('tieForVotesSmall').textContent = gameState.tieVotes.for; document.getElementById('tieAgainstVotesSmall').textContent = gameState.tieVotes.against; }
+        function resolveTieVote() { const { for: forVotes, against: againstVotes } = gameState.tieVotes; const voters = gameState.players.length - 2; const maxAllowedVotes = voters + (gameState.redFlagUsed ? 1 : 0); if (forVotes === 0 && againstVotes === 0) { showNotification("No votes have been cast yet!"); return; } if ((forVotes + againstVotes) > maxAllowedVotes) { showNotification("Too many votes have been cast!"); return; } if (forVotes === againstVotes) { showNotification("Tie again! Starting another tie-breaker round."); startTieBreaker(); return; } const winner = forVotes > againstVotes ? 'for' : 'against'; gameState.isTieBreaker = false; showResults(winner); }
+        function showResults(forcedWinner = null) {
+            showScreen('resultsScreen');
+            const votes = gameState.isTieBreaker ? gameState.tieVotes : gameState.votes;
+            const { for: forVotes, against: againstVotes } = votes;
+            const voters = gameState.players.length - 2;
+            const resultBanner = document.getElementById('roundResultBanner');
+            resultBanner.innerHTML = '';
+            let winner, loser, isPerfect = false;
+            if (forcedWinner) { winner = forcedWinner === 'for' ? gameState.currentDebaters.for : gameState.currentDebaters.against; loser = forcedWinner === 'for' ? gameState.currentDebaters.against : gameState.currentDebaters.for; }
+            else { winner = forVotes > againstVotes ? gameState.currentDebaters.for : gameState.currentDebaters.against; loser = forVotes > againstVotes ? gameState.currentDebaters.against : gameState.currentDebaters.for; isPerfect = (forVotes === voters && winner === gameState.currentDebaters.for) || (againstVotes === voters && winner === gameState.currentDebaters.against); }
+            let coinsEarned = isPerfect ? 15 : 10;
+            if (gameState.doubleDownPlayers.includes(winner)) { coinsEarned *= 2; gameState.doubleDownPlayers = gameState.doubleDownPlayers.filter(p => p !== winner); showNotification(`${winner} got double coins (${coinsEarned}) from Double Down!`); }
+            gameState.wins[winner]++; gameState.losses[loser]++; gameState.coins[winner] += coinsEarned;
+            showNotification(`${winner} earned ${coinsEarned} coins for ${isPerfect ? "PERFECT WIN" : "WIN"}!`);
+            resultBanner.className = `result-banner ${isPerfect ? 'perfect-banner' : (winner === gameState.currentDebaters.for ? 'win-banner' : 'lose-banner')}`;
+            resultBanner.innerHTML = `<span class="emoji">${gameState.isTieBreaker ? '⚔️' : (isPerfect ? '🌟' : '🏅')}</span> ${winner} wins ${gameState.isTieBreaker ? 'the tie breaker' : 'the round'}! (${Math.max(forVotes, againstVotes)}-${Math.min(forVotes, againstVotes)})<br><span style="font-size: 0.9em">+${coinsEarned} coins</span>`;
+            updateLeaderboard();
+            updatePlayerLists();
+            const continueBtn = document.getElementById('continueButton');
+            if (gameState.currentRound >= gameState.totalRounds) { continueBtn.textContent = '🏁 See Final Results'; continueBtn.onclick = showGameOver; }
+            else { continueBtn.textContent = '➡️ Continue to Round ' + (gameState.currentRound + 1); continueBtn.onclick = nextRound; }
+        }
+        function updateLeaderboard() {
+            const leaderboard = document.getElementById('leaderboard');
+            leaderboard.innerHTML = gameState.players.sort((a,b) => gameState.wins[b] - gameState.wins[a]).map(player => `<div class="player-card" onclick="showPlayerInventory('${player}')"><h3>${player}</h3><p>🏅 ${gameState.wins[player]} wins</p><p>💔 ${gameState.losses[player]} losses</p><p>💰 ${gameState.coins[player]} coins</p></div>`).join('');
+        }
+        function resetGame() { showScreen('setupScreen'); }
+        function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
+        function closeSpeakerModal() { document.getElementById('speakerModal').classList.remove('active'); }
+        function setCurrentSpeaker(team) { gameState.currentDebaterSpeaking = team; closeSpeakerModal(); }
+    </script>
+</body>
+</html>
